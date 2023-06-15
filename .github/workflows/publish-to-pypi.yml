@@ -15,15 +15,18 @@ jobs:
     - name: Install Coverage
       run: >-
         python3 -m pip install coverage
-    - name: Run Unit Tests
-      run: >-
-        coverage run -m unittest discover -v && coverage report -m --skip-empty --omit 'tests/*' --fail-under=75 
     - name: Install build tools
       run: >-
         python3 -m pip install build --user
     - name: Build package
       run: >-
         python3 -m build --sdist --wheel --outdir dist/
+    - name: Install package
+      run: >-
+        python3 -m pip install dist/voltronsecurity*.whl
+    - name: Run Unit Tests
+      run: >-
+        coverage run -m unittest discover -v && coverage report -m --skip-empty --omit 'tests/*' --fail-under=75 
     - name: Publish to Test PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
