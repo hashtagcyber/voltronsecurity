@@ -1,0 +1,29 @@
+name: Publish VoltronSecurity package to PyPI and TestPyPI
+
+on: push
+
+jobs:
+  build-and-test:
+    name: Build and Push
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.x"
+    - name: Install Coverage
+      run: >-
+        python3 -m pip install coverage
+    - name: Install build tools
+      run: >-
+        python3 -m pip install build --user
+    - name: Build package
+      run: >-
+        python3 -m build --sdist --wheel --outdir dist/
+    - name: Install package
+      run: >-
+        python3 -m pip install dist/voltronsecurity*.whl
+    - name: Run Unit Tests
+      run: >-
+        coverage run -m unittest discover -v && coverage report -m --skip-empty --omit 'tests/*' --fail-under=75
