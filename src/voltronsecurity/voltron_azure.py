@@ -1,4 +1,4 @@
-from voltron_base import (
+from voltronsecurity.voltron_base import (
     VoltronBaseProcessResponse,
     VoltronMessagePayload,
     VoltronBaseMessageInterface,
@@ -71,54 +71,61 @@ class VoltronAzureServiceBusQueue(VoltronBaseMessageInterface):
     ) -> VoltronBaseProcessResponse:
         """Override this in child class to perform an action based on the message received."""
         logger.debug("Processed Message : {}".format(message))
-        response = {"success": True, "message": "Default Message Processor. No action taken. Message deleted.", "data": message}
+        response = {
+            "success": True,
+            "message": "Default Message Processor. No action taken. Message deleted.",
+            "data": message,
+        }
         return response
 
-    def generate_message(self, handlerName:str, handlerConfig:dict, handlerData:dict, messageSource:str, startTime:int ) -> VoltronMessagePayload:
-        body = {'handlerName':handlerName, 'handlerConfig': handlerConfig, 'handlerData':handlerData, 'messageSource':messageSource, 'startTime': startTime}
-        message = ServiceBusMessage(body=json.dumps(body), content_type='application/json')
+    def generate_message(
+        self,
+        handlerName: str,
+        handlerConfig: dict,
+        handlerData: dict,
+        messageSource: str,
+        startTime: int,
+    ) -> VoltronMessagePayload:
+        body = {
+            "handlerName": handlerName,
+            "handlerConfig": handlerConfig,
+            "handlerData": handlerData,
+            "messageSource": messageSource,
+            "startTime": startTime,
+        }
+        message = ServiceBusMessage(
+            body=json.dumps(body), content_type="application/json"
+        )
         return message
 
     async def send_message(
-        self, message: VoltronMessagePayload, client: Optional[ServiceBusClient] = None, queue: Optional[str] = None
+        self,
+        message: VoltronMessagePayload,
+        client: Optional[ServiceBusClient] = None,
+        queue: Optional[str] = None,
     ) -> VoltronBaseProcessResponse:
         if queue is None:
             queue = self.queue_name
         if client is None:
             client = self.get_client()
-        servicebus_message = self.generate_message(message['handlerName'],message['handlerconfig'],message['handlerData'],message['messageSource'],message['startTime'])
+        servicebus_message = self.generate_message(
+            message["handlerName"],
+            message["handlerconfig"],
+            message["handlerData"],
+            message["messageSource"],
+            message["startTime"],
+        )
         message_list = [servicebus_message]
         async with client:
             sender = client.get_queue_sender(queue_name=queue)
             async with sender:
                 try:
                     await sender.send_messages(message_list)
-                    response = {'success':True, 'message':'Sent {} messages'.format(len(message_list))}
+                    response = {
+                        "success": True,
+                        "message": "Sent {} messages".format(len(message_list)),
+                    }
                 except Exception as e:
-                    response = {'success':False, 'message':str(e)}
-                    
-        return response
+                    response = {"success": False, "message": str(e)}
 
-if __name__ == "__main__":
-    logger.setLevel('DEBUG')
-    logger.debug('Getting Environs')
-    try:
-        VOLTRON_ASB_QUEUE = os.environ['VOLTRON_QUEUE']
-        VOLTRON_ASB_NAMESPACE = os.environ['VOLTRON_ASB_NAMESPACE']
-    except KeyError as e:
-        logger.error('Required environment variable {} not set'.format(e))
-        raise SystemExit(1)
-    logger.debug('Setting Creds')
-    creds = DefaultAzureCredential()
-    logger.debug('Creating Queue Handler')
-    voltbus = VoltronAzureServiceBusQueue(
-        VOLTRON_ASB_QUEUE, VOLTRON_ASB_NAMESPACE, creds
-    )
-    sample_message = {'handlerName':'samplehandler','handlerconfig':{},'handlerData':{},'messageSource':'voltron_azure.py','startTime':int(time.time())}
-    logger.debug('Sample Message:\n\t{}'.format(sample_message))
-    logger.debug('Writing message to queue')
-    send_results = asyncio.run(voltbus.send_message(sample_message))
-    logger.debug(send_results)
-    logger.debug('Getting messages from queue')
-    results = asyncio.run(voltbus.handle_messages())
-    logger.debug(results)
+        return response
