@@ -17,4 +17,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
 
-dependencies = []
+dependencies = [
+    'azure-identity ~= 1.27',
+    'azure-servicebus ~= 7.10'
+]
