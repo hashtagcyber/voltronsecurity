@@ -4,12 +4,14 @@ import json
 from unittest import mock
 from src.voltronsecurity.voltron_base import VoltronEncoder, VoltronFinding
 
+
 class TestVoltronEncoder(unittest.TestCase):
     def test_encoder(self):
         payload = mock.Mock()
         payload.findingOutput.return_value = {}
         results = json.dumps(payload, cls=VoltronEncoder)
         payload.findingOutput.assert_called()
+
 
 class TestVoltronBaseFinding(unittest.TestCase):
     def setUp(self):
@@ -23,11 +25,11 @@ class TestVoltronBaseFinding(unittest.TestCase):
             "toolFindingJson": {"a": 1, "b": "abc"},
             "toolFindingURL": "https://example.site/abc",
             "toolFindingSeverity": "High",
-            "voltronSeverity":"High",
-            "extractDate": datetime.datetime.now(datetime.timezone.utc).isoformat()
+            "voltronSeverity": "High",
+            "extractDate": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         }
 
-    #@mock.patch(VoltronFinding.processPayload())
+    # @mock.patch(VoltronFinding.processPayload())
     def test_init(self):
         # create an instance of the VoltronFinding class using the sample payload
         finding = VoltronFinding(self.base_payload)

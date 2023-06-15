@@ -22,6 +22,8 @@ class VoltronEncoder(json.JSONEncoder):
 
 
 class VoltronFindingOutput(typing.TypedDict):
+    """Every VoltronFinding should return a dict with these keys"""
+
     toolName: str
     resourceType: str
     resourceId: str
@@ -33,6 +35,60 @@ class VoltronFindingOutput(typing.TypedDict):
     voltronSeverity: str
     extractDate: str
     findingDate: str
+
+
+class VoltronMessagePayload(typing.TypedDict):
+    """Every VoltronMessage should return a dict with these keys"""
+
+    handlerName: str
+    handlerConfig: dict
+    handlerData: dict
+    messageSource: str
+    startTime: int  # EpochTime
+
+
+class VoltronBaseProcessResponse(typing.TypedDict):
+    """Every action should return a dict with these keys"""
+
+    success: bool
+    message: str
+    data: dict
+
+
+class VoltronBaseMessageInterface:
+    def handle_messages(self, *args, **kwargs) -> list[VoltronBaseProcessResponse]:
+        """Override in child class to listen for and process messages."""
+        pass
+
+    def process_message(
+        self, message: VoltronMessagePayload
+    ) -> VoltronBaseProcessResponse:
+        """Override in child class to process the message"""
+        pass
+
+    def generate_message(self, *args, **kwargs) -> VoltronMessagePayload:
+        """Overide in child class to create a VoltronMessagePayload"""
+        pass
+
+    def send_message(
+        self, message: VoltronMessagePayload, *args, **kwargs
+    ) -> VoltronBaseProcessResponse:
+        """Override in child class to send the message"""
+        pass
+
+
+class VoltronBaseQueryInterface:
+    def run_query(
+        self, query_message: VoltronMessagePayload
+    ) -> VoltronBaseProcessResponse:
+        """Override in child class to execute a query"""
+        pass
+
+    def process_results(
+        self, results: VoltronBaseProcessResponse
+    ) -> VoltronBaseProcessResponse:
+        """Override in child class to convert results into a Finding or Message. Store them in a ProcessResponse object"""
+        pass
 
 
 class VoltronFinding:
