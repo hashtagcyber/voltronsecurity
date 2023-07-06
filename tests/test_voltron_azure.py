@@ -19,7 +19,7 @@ class TestVoltronAzureServiceBusQueue(unittest.TestCase):
         self.sample_creds = mock.MagicMock(spec=DefaultAzureCredential)
         self.sample_voltron_payload = {
             "handlerName": "samplehandler",
-            "handlerconfig": {},
+            "handlerConfig": {},
             "handlerData": {},
             "messageSource": "test_voltron_azure.py",
             "startTime": 12345,

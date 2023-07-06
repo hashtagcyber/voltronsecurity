@@ -110,7 +110,7 @@ class VoltronAzureServiceBusQueue(VoltronBaseMessageInterface):
             client = self.get_client()
         servicebus_message = self.generate_message(
             message["handlerName"],
-            message["handlerconfig"],
+            message["handlerConfig"],
             message["handlerData"],
             message["messageSource"],
             message["startTime"],
