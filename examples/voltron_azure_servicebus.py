@@ -5,6 +5,7 @@ import time
 
 from voltronsecurity import voltron_azure
 from azure.core.credentials import AzureSasCredential
+
 FORMAT = "[%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger("voltron_azure_example")
@@ -20,8 +21,8 @@ if __name__ == "__main__":
         raise SystemExit(1)
 
     logger.debug("Setting Creds")
-    #creds = voltron_azure.DefaultAzureCredential()
-    creds = AzureSasCredential(os.environ.get('AZUREBOOM'))
+    # creds = voltron_azure.DefaultAzureCredential()
+    creds = AzureSasCredential(os.environ.get("AZUREBOOM"))
 
     logger.debug("Creating Queue Handler")
     voltbus = voltron_azure.VoltronAzureServiceBusQueue(
