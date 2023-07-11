@@ -23,13 +23,14 @@ class VoltronSnykCodeFinding(VoltronFinding):
         self.resourceType = "CodeRepo"
         self.resourceId = payload["repoName"]
         self.toolFindingId = payload["id"]
-        self.toolFindingSummary = payload['longTitle']
+        self.toolFindingSummary = payload["longTitle"]
         self.toolFindingJson = payload
         self.toolFindingURL = payload["issueLink"]
         self.toolFindingSeverity = payload["severity"]
         self.voltronSeverity = payload["severity"]
         self.extractDate = datetime.datetime.now(datetime.timezone.utc).isoformat()
         self.findingDate = UNKNOWN_DATE
+
 
 class snykFinding:
     def __init__(self, snykData, projectObject=None):
@@ -83,7 +84,7 @@ class snykProject:
         except Exception as e:
             logger.error(projectData)
             raise e
-        
+
     def __repr__(self):
         return json.dumps(self.__dict__, indent=1)
 
@@ -100,7 +101,7 @@ class SnykCodeCollector:
         if orgs is None:
             orgs = [x["id"] for x in org_response_data]
         self.orgs = orgs
-    
+
     def gen_session(self, api_key):
         logger.info("Started")
         session = requests.Session()
@@ -203,7 +204,7 @@ class SnykCodeCollector:
             try:
                 all_issues.extend(page.json()["data"])
             except KeyError:
-                logger.error('No data in response.')
+                logger.error("No data in response.")
                 logger.error(page.json())
                 continue
 
@@ -227,7 +228,13 @@ class SnykCodeCollector:
         except Exception as e:
             logger.error("Unable to get data for {}".format(target_url))
             logger.error(e)
-            results = {"attributes":{"title":"DecorationFailed","primaryFilePath":"DecorationFailed","primaryRegion":"DecorationFailed"}}
+            results = {
+                "attributes": {
+                    "title": "DecorationFailed",
+                    "primaryFilePath": "DecorationFailed",
+                    "primaryRegion": "DecorationFailed",
+                }
+            }
         return results
 
     def write_csv(self, results, outfile_name):
